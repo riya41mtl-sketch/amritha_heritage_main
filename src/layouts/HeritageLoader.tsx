@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 
-interface ElegantHeritageLoaderProps {
+interface HeritageLoaderProps {
   isLoading: boolean;
   logoSrc: string;
   text?: string;
   minDisplayTime?: number;
 }
 
-const ElegantHeritageLoader: React.FC<ElegantHeritageLoaderProps> = ({
+const HeritageLoader: React.FC<HeritageLoaderProps> = ({
   isLoading,
   logoSrc,
-  text = "Welcome to Heritage",
   minDisplayTime = 3000
 }) => {
   const [showLoader, setShowLoader] = useState(isLoading);
@@ -39,7 +38,7 @@ const ElegantHeritageLoader: React.FC<ElegantHeritageLoaderProps> = ({
       {/* Logo with enhanced fading animation */}
       <img
         src={logoSrc}
-        alt={text}
+        alt="Amritha Heritage Logo"
         className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 object-contain"
         style={{
           animation: 'logoFade 4s ease-in-out infinite'
@@ -91,4 +90,4 @@ const ElegantHeritageLoader: React.FC<ElegantHeritageLoaderProps> = ({
   );
 };
 
-export default ElegantHeritageLoader;
+export default HeritageLoader;

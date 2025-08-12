@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Clock, ArrowRight, ChevronDown } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 
 interface Dish {
   id: number;
@@ -21,6 +21,7 @@ interface GalleryImage {
 const DiningSection: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [loadImage, setLoadImage] = useState(false);
   const [visibleCards, setVisibleCards] = useState<boolean[]>([
     false,
     false,
@@ -147,16 +148,21 @@ const DiningSection: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Intersection Observer for fade-up animation
+  // Intersection Observer for fade-up animation and lazy loading
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          setLoadImage(true);
         }
       },
       { threshold: 0.3 }
     );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
 
     if (quoteRef.current) {
       observer.observe(quoteRef.current);
@@ -206,27 +212,15 @@ const DiningSection: React.FC = () => {
     return () => observer.disconnect();
   }, [isMobile]);
 
-  const nextGalleryImage = () => {
-    setCurrentGalleryIndex((prev) => 
-      prev === galleryImages.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  const prevGalleryImage = () => {
-    setCurrentGalleryIndex((prev) => 
-      prev === 0 ? galleryImages.length - 1 : prev - 1
-    );
-  };
-
   return (
-    <div className="w-full bg-heritage-bg-secondary">
+    <div className="w-full bg-heritage-bg-primary">
       {/* Hero Section with Parallax - Mobile Optimized */}
       <div ref={heroRef} className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         {/* Background image with parallax effect */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: "url('/diningparallax.jpg')",
+            backgroundImage: loadImage ? "url('/diningparallax.jpg')" : "none",
             transform: `translateY(${scrollY * (isMobile ? 0.3 : 0.5)}px)`,
             transition: "transform 75ms linear",
           }}
@@ -240,11 +234,11 @@ const DiningSection: React.FC = () => {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h1 className="text-heritage-bg-secondary text-center max-w-4xl font-playfair">
+          <h1 className="text-white text-center max-w-4xl font-playfair">
             <span className="block text-lg md:text-2xl lg:text-3xl font-light leading-tight">
               "Welcome to Kohinoor Restaurant —
             </span>
-            <span className="block text-base md:text-xl lg:text-2xl font-light mt-2 text-gray-200 font-cormorant">
+            <span className="block text-base md:text-xl lg:text-2xl font-light mt-2 text-heritage-bg-secondary font-cormorant">
               where European and Indian cuisines blend in colonial elegance"
             </span>
           </h1>
@@ -252,12 +246,12 @@ const DiningSection: React.FC = () => {
       </div>
 
       {/* Signature Dishes Section - Mobile Responsive */}
-      <div className="py-8 md:py-16">
+      <div className="py-16 md:py-24 bg-heritage-bg-secondary">
         <div className="max-w-full mx-auto px-4 md:px-6">
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-light text-center mb-4 md:mb-6 text-text-primary-title font-playfair">
             Heritage Dining
           </h2>
-          <p className="text-center text-text-primary-title/80 text-base md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-8 md:mb-12 font-cormorant px-4">
+          <p className="text-center text-text-description text-base md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-8 md:mb-12 font-cormorant px-4">
             Experience the legendary Kohinoor Restaurant, a star attraction of
             the 1970s Malayalam film world, now revived with a menu that
             perfectly blends European and Indian cuisines in an atmosphere of
@@ -266,14 +260,13 @@ const DiningSection: React.FC = () => {
 
           {/* Decorative SVG Element - Mobile Responsive */}
           <div className="flex items-center justify-center mb-8 md:mb-16">
-            <div className="flex-1 h-px bg-gray-300 mx-4 md:mx-8"></div>
-            <div className="flex-shrink-0">
+            <div className="flex-1 h-px bg-border-soft mx-4 md:mx-8"></div>
+            <div className="flex-shrink-0 text-text-secondary-title">
               <svg
                 width={isMobile ? "40" : "60"}
                 height={isMobile ? "40" : "60"}
                 viewBox="0 0 200 200"
                 xmlns="http://www.w3.org/2000/svg"
-                className="text-primary-bg"
               >
                 <g transform="translate(100,100)">
                   <path
@@ -308,7 +301,7 @@ const DiningSection: React.FC = () => {
                 </g>
               </svg>
             </div>
-            <div className="flex-1 h-px bg-gray-300 mx-4 md:mx-8"></div>
+            <div className="flex-1 h-px bg-border-soft mx-4 md:mx-8"></div>
           </div>
 
           {/* Dishes Container - Responsive Layout */}
@@ -323,33 +316,11 @@ const DiningSection: React.FC = () => {
                   msOverflowStyle: "none",
                   scrollSnapType: "x mandatory",
                 }}
-                onMouseDown={(e) => {
-                  const startX = e.pageX - dishesRef.current!.offsetLeft;
-                  const scrollLeft = dishesRef.current!.scrollLeft;
-                  let isDown = true;
-
-                  const handleMouseMove = (e: MouseEvent) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - dishesRef.current!.offsetLeft;
-                    const walk = (x - startX) * 2;
-                    dishesRef.current!.scrollLeft = scrollLeft - walk;
-                  };
-
-                  const handleMouseUp = () => {
-                    isDown = false;
-                    document.removeEventListener("mousemove", handleMouseMove);
-                    document.removeEventListener("mouseup", handleMouseUp);
-                  };
-
-                  document.addEventListener("mousemove", handleMouseMove);
-                  document.addEventListener("mouseup", handleMouseUp);
-                }}
               >
                 {signatureDishes.map((dish, index) => (
                   <div
                     key={dish.id}
-                    className={`destination-card flex-none w-[250px] md:w-[300px] lg:w-[350px] group relative overflow-hidden rounded-3xl bg-heritage-bg-accent shadow-lg hover:shadow-2xl transition-all duration-700 transform border-2 border-text-description-2 snap-center select-none ${
+                    className={`destination-card flex-none w-[350px] group relative overflow-hidden rounded-3xl bg-heritage-bg-primary shadow-lg hover:shadow-2xl transition-all duration-700 transform border-2 border-border-soft hover:border-border-accent snap-center select-none ${
                       visibleCards[index]
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-12"
@@ -357,7 +328,7 @@ const DiningSection: React.FC = () => {
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
                     {/* Image Container */}
-                    <div className="relative h-64 md:h-72 overflow-hidden">
+                    <div className="relative h-72 overflow-hidden">
                       <img
                         src={dish.image}
                         alt={dish.name}
@@ -367,22 +338,22 @@ const DiningSection: React.FC = () => {
                       />
                       <div className="absolute inset-0"></div>
                       <div className="absolute bottom-4 right-4 flex items-center gap-1 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full">
-                        <Clock size={14} className="text-primary-text/70" />
-                        <span className="text-sm font-medium text-primary-text">
+                        <Clock size={14} className="text-text-description/70" />
+                        <span className="text-sm font-medium text-text-description">
                           {dish.distance}
                         </span>
                       </div>
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 md:p-8">
-                      <h3 className="text-xl md:text-2xl font-bold text-text-primary-title mb-4 group-hover:text-text-primary-title/80 transition-colors duration-300 font-playfair">
+                    <div className="p-8">
+                      <h3 className="text-2xl font-bold text-text-primary-title mb-4 group-hover:text-text-secondary-title transition-colors duration-300 font-playfair">
                         {dish.name}
                       </h3>
-                      <p className="text-text-primary-title/70 leading-relaxed mb-6 line-clamp-3 md:line-clamp-none font-cormorant">
+                      <p className="text-text-description leading-relaxed mb-6 font-cormorant">
                         {dish.description}
                       </p>
-                      <button className="self-start group/btn inline-flex items-center gap-2 px-6 py-3 text-sm font-normal tracking-[0.15em] text-button-accent-bg border-2 border-button-accent-bg rounded-md transition-all duration-300 hover:shadow-lg hover:shadow-button-accent-bg/25 hover:-translate-y-0.5 hover:tracking-widest hover:bg-button-accent-bg hover:text-heritage-bg-accent">
+                      <button className="self-start group/btn inline-flex items-center gap-2 px-6 py-3 text-sm font-normal tracking-[0.15em] text-button-secondary-text border-2 border-button-secondary-border rounded-md transition-all duration-300 hover:shadow-lg hover:shadow-button-secondary-hover-border/25 hover:-translate-y-0.5 hover:tracking-widest hover:bg-button-secondary-hover-bg hover:text-button-secondary-hover-text">
                         Order Now
                         <ArrowRight
                           size={16}
@@ -390,7 +361,6 @@ const DiningSection: React.FC = () => {
                         />
                       </button>
                     </div>
-                    <div className="absolute inset-0 rounded-none border-2 border-transparent group-hover:border-primary-text/20 transition-colors duration-300 pointer-events-none"></div>
                   </div>
                 ))}
               </div>
@@ -401,7 +371,7 @@ const DiningSection: React.FC = () => {
               {signatureDishes.map((dish, index) => (
                 <div
                   key={dish.id}
-                  className={`mobile-card destination-card w-full group relative overflow-hidden rounded-2xl bg-heritage-bg-accent shadow-lg transition-all duration-700 transform border-2 border-text-description-2 ${
+                  className={`mobile-card destination-card w-full group relative overflow-hidden rounded-2xl bg-heritage-bg-primary shadow-lg transition-all duration-700 transform border-2 border-border-soft ${
                     visibleCards[index]
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 translate-y-12"
@@ -420,8 +390,8 @@ const DiningSection: React.FC = () => {
                         draggable={false}
                       />
                       <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-full">
-                        <Clock size={12} className="text-primary-text/70" />
-                        <span className="text-xs font-medium text-primary-text">
+                        <Clock size={12} className="text-text-description/70" />
+                        <span className="text-xs font-medium text-text-description">
                           {dish.distance}
                         </span>
                       </div>
@@ -433,11 +403,11 @@ const DiningSection: React.FC = () => {
                         <h3 className="text-lg font-bold text-text-primary-title mb-2 font-playfair leading-tight">
                           {dish.name}
                         </h3>
-                        <p className="text-text-primary-title/70 text-sm leading-relaxed line-clamp-3 font-cormorant">
+                        <p className="text-text-description text-sm leading-relaxed line-clamp-3 font-cormorant">
                           {dish.description}
                         </p>
                       </div>
-                      <button className="self-start inline-flex items-center gap-1 px-4 py-2 text-xs font-normal tracking-[0.1em] text-button-accent-bg border border-button-accent-bg rounded-md transition-all duration-300 hover:bg-button-accent-bg hover:text-heritage-bg-accent mt-2">
+                      <button className="self-start inline-flex items-center gap-1 px-4 py-2 text-xs font-normal tracking-[0.15em] text-button-secondary-text border border-button-secondary-border rounded-md transition-all duration-300 hover:bg-button-secondary-hover-bg hover:text-button-secondary-hover-text mt-2">
                         Order Now
                         <ArrowRight size={12} />
                       </button>
@@ -451,22 +421,12 @@ const DiningSection: React.FC = () => {
       </div>
 
       {/* Explore Menu CTA - Mobile Responsive */}
-      <div className="py-8 md:py-16 bg-primary-bg relative overflow-hidden">
-        {/* Decorative SVG Elements - Hidden on small mobile */}
-        <div className="hidden sm:block absolute top-8 left-8 opacity-10">
-          <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50,10 C60,20 60,30 50,40 C40,30 40,20 50,10" fill="#514f13" />
-            <path d="M50,10 C60,20 60,30 50,40 C40,30 40,20 50,10" fill="#514f13" transform="rotate(90 50 50)" />
-            <path d="M50,10 C60,20 60,30 50,40 C40,30 40,20 50,10" fill="#514f13" transform="rotate(180 50 50)" />
-            <path d="M50,10 C60,20 60,30 50,40 C40,30 40,20 50,10" fill="#514f13" transform="rotate(270 50 50)" />
-          </svg>
-        </div>
-
+      <div className="py-16 md:py-24 bg-heritage-bg-tertiary relative overflow-hidden">
         <div className="text-center max-w-4xl mx-auto px-4 md:px-8 relative z-10">
           <h3 className="text-2xl md:text-4xl lg:text-5xl font-light text-text-primary-title mb-4 md:mb-6 font-playfair">
             Ready to Experience Colonial Cuisine?
           </h3>
-          <p className="text-text-primary-title/80 text-base md:text-xl lg:text-2xl leading-relaxed mb-8 md:mb-12 font-cormorant">
+          <p className="text-text-description text-base md:text-xl lg:text-2xl leading-relaxed mb-8 md:mb-12 font-cormorant">
             From traditional Kerala Sadhya to European fusion dishes, our
             Kohinoor Restaurant menu offers a culinary journey through time.
             Each dish tells a story of heritage and tradition.
@@ -474,35 +434,27 @@ const DiningSection: React.FC = () => {
 
           {/* Decorative Line Above Button */}
           <div className="flex items-center justify-center mb-6 md:mb-8">
-            <div className="flex-1 h-px bg-primary-text/20 mx-4"></div>
-            <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="mx-4">
-              <path d="M50,20 C60,30 60,40 50,50 C40,40 40,30 50,20" fill="#514f13" opacity="0.6" />
-              <path d="M50,20 C60,30 60,40 50,50 C40,40 40,30 50,20" fill="#514f13" opacity="0.6" transform="rotate(180 50 50)" />
+            <div className="flex-1 h-px bg-border-accent/50 mx-4"></div>
+            <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="mx-4 text-text-secondary-title">
+              <path d="M50,20 C60,30 60,40 50,50 C40,40 40,30 50,20" fill="currentColor" opacity="0.6" />
+              <path d="M50,20 C60,30 60,40 50,50 C40,40 40,30 50,20" fill="currentColor" opacity="0.6" transform="rotate(180 50 50)" />
             </svg>
-            <div className="flex-1 h-px bg-primary-text/20 mx-4"></div>
+            <div className="flex-1 h-px bg-border-accent/50 mx-4"></div>
           </div>
 
-          {/* Responsive Button */}
-          <button
-            className="px-8 md:px-12 py-4 md:py-6 text-lg md:text-xl lg:text-2xl font-medium text-heritage-bg-secondary bg-button-accent-bg rounded-2xl transition-all duration-300 hover:bg-primary-text hover:text-primary-bg transform hover:scale-105 hover:shadow-xl"
-            style={{
-              fontFamily: "Work Sans, sans-serif",
-              borderWidth: "3px",
-              letterSpacing: "0.05em",
-            }}
-          >
+          <button className="px-8 md:px-12 py-4 md:py-5 text-lg md:text-xl font-medium text-button-accent-text bg-button-accent-bg rounded-xl transition-all duration-300 hover:bg-button-accent-hover-bg transform hover:scale-105 hover:shadow-xl">
             EXPLORE OUR MENU
           </button>
         </div>
       </div>
 
       {/* Gallery Section - Mobile Responsive */}
-      <div className="py-8 md:py-16 bg-text-primary-title relative">
+      <div className="py-16 md:py-24 bg-text-primary-title relative">
         <div className="mx-4 md:mx-8">
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-light text-center text-heritage-bg-tertiary mb-4 md:mb-6 font-playfair">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-light text-center text-heritage-bg-primary mb-4 md:mb-6 font-playfair">
             Our Spaces
           </h2>
-          <p className="text-center text-heritage-bg-tertiary/80 mb-8 md:mb-12 max-w-3xl mx-auto text-base md:text-xl lg:text-2xl leading-relaxed font-light font-cormorant px-4">
+          <p className="text-center text-heritage-bg-secondary/80 mb-8 md:mb-12 max-w-3xl mx-auto text-base md:text-xl lg:text-2xl leading-relaxed font-light font-cormorant px-4">
             Step into the grandeur of colonial elegance where every corner tells
             a story. From our heritage dining hall with its majestic
             architecture to our state-of-the-art kitchen where culinary magic
@@ -511,7 +463,7 @@ const DiningSection: React.FC = () => {
           </p>
 
           {/* Desktop Gallery */}
-          <div className="hidden md:block relative h-[70vh] border-2 border-heritage-bg-accent overflow-hidden rounded-3xl">
+          <div className="hidden md:block relative h-[70vh] border-2 border-heritage-bg-accent/50 overflow-hidden rounded-3xl">
             <div
               ref={galleryRef}
               className="flex h-full overflow-x-auto gap-0 scroll-smooth cursor-grab active:cursor-grabbing"
@@ -519,28 +471,6 @@ const DiningSection: React.FC = () => {
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
                 scrollSnapType: "x mandatory",
-              }}
-              onMouseDown={(e) => {
-                const startX = e.pageX - galleryRef.current!.offsetLeft;
-                const scrollLeft = galleryRef.current!.scrollLeft;
-                let isDown = true;
-
-                const handleMouseMove = (e: MouseEvent) => {
-                  if (!isDown) return;
-                  e.preventDefault();
-                  const x = e.pageX - galleryRef.current!.offsetLeft;
-                  const walk = (x - startX) * 2;
-                  galleryRef.current!.scrollLeft = scrollLeft - walk;
-                };
-
-                const handleMouseUp = () => {
-                  isDown = false;
-                  document.removeEventListener("mousemove", handleMouseMove);
-                  document.removeEventListener("mouseup", handleMouseUp);
-                };
-
-                document.addEventListener("mousemove", handleMouseMove);
-                document.addEventListener("mouseup", handleMouseUp);
               }}
             >
               {galleryImages.map((image) => (
@@ -555,12 +485,12 @@ const DiningSection: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-20"></div>
                   </div>
-                  <div className="absolute inset-0 flex flex-col justify-center items-start p-12 max-w-2xl bg-text-primary-title">
-                    <h3 className="text-heritage-bg-tertiary text-3xl md:text-5xl font-light mb-4 drop-shadow-xl font-playfair">
+                  <div className="absolute inset-0 flex flex-col justify-center items-start p-12 max-w-2xl bg-gradient-to-r from-text-primary-title to-transparent">
+                    <h3 className="text-heritage-bg-primary text-3xl md:text-5xl font-light mb-4 drop-shadow-xl font-playfair">
                       {image.label}
                     </h3>
                     <div className="w-16 h-1 bg-button-accent-bg mb-6 drop-shadow-lg"></div>
-                    <p className="text-heritage-bg-tertiary/60 text-lg md:text-xl leading-relaxed drop-shadow-lg font-light font-cormorant">
+                    <p className="text-heritage-bg-secondary/80 text-lg md:text-xl leading-relaxed drop-shadow-lg font-light font-cormorant">
                       {image.description}
                     </p>
                   </div>
@@ -571,7 +501,7 @@ const DiningSection: React.FC = () => {
 
           {/* Mobile Gallery - Vertical Stack with Auto-Play */}
           <div className="block md:hidden">
-            <div className="relative h-[60vh] border-2 border-heritage-bg-accent overflow-hidden rounded-2xl">
+            <div className="relative h-[60vh] border-2 border-heritage-bg-accent/50 overflow-hidden rounded-2xl">
               <div className="relative w-full h-full">
                 {galleryImages.map((image, index) => (
                   <div
@@ -590,12 +520,12 @@ const DiningSection: React.FC = () => {
                     <div className="absolute inset-0 bg-black bg-opacity-30"></div>
                     
                     {/* Mobile Content Overlay */}
-                    <div className="absolute inset-0 flex flex-col justify-end p-6">
-                      <h3 className="text-heritage-bg-tertiary text-2xl font-light mb-2 drop-shadow-xl font-playfair">
+                    <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/60 to-transparent">
+                      <h3 className="text-white text-2xl font-light mb-2 drop-shadow-xl font-playfair">
                         {image.label}
                       </h3>
                       <div className="w-12 h-0.5 bg-button-accent-bg mb-4 drop-shadow-lg"></div>
-                      <p className="text-heritage-bg-tertiary/80 text-sm leading-relaxed drop-shadow-lg font-light font-cormorant">
+                      <p className="text-heritage-bg-primary/90 text-sm leading-relaxed drop-shadow-lg font-light font-cormorant">
                         {image.description}
                       </p>
                     </div>
@@ -617,94 +547,8 @@ const DiningSection: React.FC = () => {
                   />
                 ))}
               </div>
-
-              {/* Mobile Swipe Indicators */}
-              <button
-                onClick={prevGalleryImage}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/50 transition-colors duration-300"
-              >
-                <ChevronDown size={20} className="rotate-90" />
-              </button>
-              
-              <button
-                onClick={nextGalleryImage}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/50 transition-colors duration-300"
-              >
-                <ChevronDown size={20} className="-rotate-90" />
-              </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Custom CSS for hiding scrollbars */}
-      <style>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        
-        .line-clamp-3 {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
-
-      {/* Decorative SVG Element with Extending Lines */}
-      <div className="relative py-8 md:py-16 bg-text-primary-title">
-        <div className="flex items-center justify-center">
-          {/* Left Line */}
-          <div className="flex-1 h-px bg-gray-300 mx-4 md:mx-8"></div>
-
-          {/* SVG Element */}
-          <div className="flex-shrink-0 text-text-primary-title">
-            <svg
-              width={isMobile ? "40" : "60"}
-              height={isMobile ? "40" : "60"}
-              viewBox="0 0 200 200"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g transform="translate(100,100)">
-                <path
-                  d="M0,-60 C15,-45 15,-15 0,0 C-15,-15 -15,-45 0,-60"
-                  fill="#514f13"
-                />
-                <path
-                  d="M0,-60 C15,-45 15,-15 0,0 C-15,-15 -15,-45 0,-60"
-                  fill="#514f13"
-                  transform="rotate(60)"
-                />
-                <path
-                  d="M0,-60 C15,-45 15,-15 0,0 C-15,-15 -15,-45 0,-60"
-                  fill="#514f13"
-                  transform="rotate(120)"
-                />
-                <path
-                  d="M0,-60 C15,-45 15,-15 0,0 C-15,-15 -15,-45 0,-60"
-                  fill="#514f13"
-                  transform="rotate(180)"
-                />
-                <path
-                  d="M0,-60 C15,-45 15,-15 0,0 C-15,-15 -15,-45 0,-60"
-                  fill="#514f13"
-                  transform="rotate(240)"
-                />
-                <path
-                  d="M0,-60 C15,-45 15,-15 0,0 C-15,-15 -15,-45 0,-60"
-                  fill="#514f13"
-                  transform="rotate(300)"
-                />
-              </g>
-            </svg>
-          </div>
-
-          {/* Right Line */}
-          <div className="flex-1 h-px bg-gray-300 mx-4 md:mx-8"></div>
         </div>
       </div>
     </div>
