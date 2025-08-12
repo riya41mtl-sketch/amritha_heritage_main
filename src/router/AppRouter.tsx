@@ -1,21 +1,29 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from '../layouts/Layout';
-import LoaderSpinner from '../components/LoaderSpinner';
+import HeritageLoader from '../layouts/HeritageLoader';
 
 const Home = lazy(() => import('../pages/Home'));
 const About = lazy(() => import('../pages/About'));
-const Contact = lazy(() => import('../pages/Contact'));
+const Accommodation = lazy(() => import('../pages/Accommodation'));
+const Destination = lazy(() => import('../pages/Destination'));
+const Gallery = lazy(() => import('../pages/Gallery'));
+const Blog = lazy(() => import('../pages/Blog'));
+const ContactPage = lazy(() => import('../pages/ContactPage'));
 
 const AppRouter = () => {
   return (
     <Router>
-      <Suspense fallback={<div className="flex justify-center items-center h-screen"><LoaderSpinner size="lg" /></div>}>
+      <Suspense fallback={<HeritageLoader isLoading={true} />}>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
+            <Route path="rooms" element={<Accommodation />} />
+            <Route path="destination" element={<Destination />} />
+            <Route path="gallery" element={<Gallery />} />
+            <Route path="blog" element={<Blog />} />
+            <Route path="contact" element={<ContactPage />} />
           </Route>
         </Routes>
       </Suspense>

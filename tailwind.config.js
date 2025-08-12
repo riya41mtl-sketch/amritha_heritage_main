@@ -7,45 +7,19 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'cinzel': ['Cinzel', 'serif'],
-        'cormorant': ['Cormorant Garamond', 'serif'],
-        'playfair': ['Playfair Display', 'serif'],
-        'poppins': ['Poppins', 'sans-serif'],
+        'serif-heading': ['Playfair Display', 'serif'],
+        'serif-subheading': ['Cormorant Garamond', 'serif'],
+        'sans-body': ['Lora', 'sans-serif'],
       },
       colors: {
-        // --- Core Heritage Neutrals (for backgrounds and subtle elements) ---
-        'heritage-bg-primary': '#FBF9F6',
-        'heritage-bg-secondary': '#F5F0E6',
-        'heritage-bg-tertiary': '#EDE8DA',
-        'heritage-bg-accent': '#DCD7C9',
-
-        // --- Text Colors ---
-        'text-primary-title': '#3A4A3E',
-        'text-secondary-title': '#607C6E',
-        'text-description': '#5D5C50',
-        'text-description-2': '#313f35',
-        'text-description-3': '#435547',
-        'text-more-description': '#7C7B6F',
-
-        // --- Border Colors ---
-        'border-soft': '#D9D3C1',
-        'border-accent': '#A09782',
-
-        // --- Button Colors ---
-        'button-primary-bg': '#7A6B5C',
-        'button-primary-text': '#FBF9F6',
-        'button-primary-hover-bg': '#5C4E42',
-        'button-primary-hover-text': '#FBF9F6',
-        'button-secondary-bg': 'transparent',
-        'button-secondary-border': '#7A6B5C',
-        'button-secondary-text': '#7A6B5C',
-        'button-secondary-hover-bg': '#F5F0E6',
-        'button-secondary-hover-border': '#5C4E42',
-        'button-secondary-hover-text': '#5C4E42',
-        'button-accent-bg': '#B07B5F',
-        'button-accent-text': '#FBF9F6',
-        'button-accent-hover-bg': '#9C6A50',
-        'button-accent-hover-text': '#FBF9F6',
+        'heritage-ivory': '#FDFDF6', // Main background - like aged paper
+        'heritage-sandstone': '#EAE0D5', // Secondary background
+        'heritage-ochre': '#C6AC8F', // Accent, borders, details
+        'heritage-terracotta': '#B07B5F', // Accent buttons, highlights
+        'heritage-green': '#3A4A3E', // Main text, dark elements
+        'heritage-blue': '#2C3E50', // Royal blue for specific accents
+        'heritage-maroon': '#6D2E46', // Deep maroon for highlights
+        'heritage-gold': '#D4AF37', // Gold foil accents
       },
       spacing: {
         '1': '4px',
@@ -54,9 +28,7 @@ export default {
         '4': '16px',
         '5': '20px',
         '6': '24px',
-        '7': '28px',
         '8': '32px',
-        '9': '36px',
         '10': '40px',
         '12': '48px',
         '16': '64px',
@@ -67,9 +39,8 @@ export default {
       borderRadius: {
         'sm': '4px',
         'md': '8px',
-        'lg': '12px',
-        'xl': '16px',
-        '2xl': '24px',
+        'lg': '16px',
+        'xl': '24px',
         'full': '9999px',
       },
     },

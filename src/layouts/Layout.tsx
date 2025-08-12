@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Transition, Variants } from "framer-motion";
 import NavBar from "./Navbar";
-import Footer from "../components/Footer";
+import Footer from "./Footer";
 import HeritageLoader from "./HeritageLoader";
 import { usePageLoader } from "../hooks/usePageLoader";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
@@ -46,11 +46,10 @@ const Layout = () => {
         <HeritageLoader
           isLoading={isLoading}
           logoSrc="/logoBlack.png"
-          text="Welcome to Amritha Heritage"
           minDisplayTime={3000}
         />
       ) : (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-heritage-ivory">
           <NavBar />
           <AnimatePresence mode="wait">
             <motion.main
@@ -60,7 +59,7 @@ const Layout = () => {
               animate="in"
               exit="out"
               transition={pageTransition}
-              className="flex-grow"
+              className="flex-grow pt-20" // Add padding to offset fixed navbar
             >
               <Outlet />
             </motion.main>

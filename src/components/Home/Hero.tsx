@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Hero: React.FC = () => {
   return (
@@ -7,7 +8,6 @@ const Hero: React.FC = () => {
       data-section="hero"
       className="relative h-screen w-full overflow-hidden"
     >
-      {/* Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
         autoPlay
@@ -17,50 +17,59 @@ const Hero: React.FC = () => {
         poster="/heroparallax.jpg"
       >
         <source
-          src="/videos/hero2.mp4"
+          src="/videos/hero.mp4"
           type="video/mp4"
         />
-        {/* Fallback for browsers that don't support the video tag */}
-        <div className="absolute inset-0 bg-text-primary-title"></div>
+        <div className="absolute inset-0 bg-heritage-green"></div>
       </video>
 
-      {/* Video Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-heritage-green/50"></div>
 
-      {/* Content Container */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center px-6 md:px-12">
+      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-6 text-heritage-ivory">
 
-        {/* Small name on top */}
-        <div className="text-heritage-bg-primary text-sm md:text-base tracking-[0.3em] font-light mb-8 md:mb-12 opacity-90 font-playfair">
-          AMRITHA HERITAGE
-        </div>
+        <motion.h1
+          className="font-serif-heading text-5xl md:text-7xl lg:text-8xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          Step into a Living Legacy
+        </motion.h1>
 
-        {/* Main Heading */}
-        <div className="text-center text-white mb-16 md:mb-20">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-light leading-tight font-playfair">
-            <div className="mb-2 md:mb-4">Where History</div>
-            <div className="italic font-light">
-              <span className="italic">meets</span>{' '}
-              <span className="font-light">Luxury</span>
-            </div>
-          </h1>
-        </div>
+        <motion.p
+          className="font-sans-body text-lg md:text-xl max-w-2xl mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          Experience the elegance of a bygone era at Amritha Heritage
+        </motion.p>
 
-        {/* Bottom Quote */}
-        <div className="absolute bottom-24 md:bottom-32 left-1/2 transform -translate-x-1/2 text-center">
-          <p className="text-heritage-bg-secondary text-base md:text-lg font-light max-w-2xl mx-auto leading-relaxed px-6 font-cormorant">
-            Experience the timeless elegance of colonial Thiruvithamkoor<br className="hidden md:block" />
-            in the heart of Thiruvananthapuram
-          </p>
-        </div>
+        <motion.div
+          className="flex flex-col sm:flex-row gap-4 mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          <button className="px-8 py-3 bg-heritage-ochre text-heritage-green font-semibold rounded-md hover:bg-opacity-90 transition-colors duration-300">
+            Book Your Stay
+          </button>
+          <button className="px-8 py-3 border border-heritage-ivory text-heritage-ivory rounded-md hover:bg-heritage-ivory hover:text-heritage-green transition-colors duration-300">
+            Explore the Heritage
+          </button>
+        </motion.div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 md:bottom-12 left-1/2 transform -translate-x-1/2">
+        <motion.div
+          className="absolute bottom-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+        >
           <div className="flex flex-col items-center animate-bounce">
-            <div className="w-px h-8 md:h-12 bg-border-soft/70 mb-2"></div>
-            <ChevronDown className="w-5 h-5 md:w-6 md:h-6 text-border-soft/70" />
+            <span className="font-sans-body text-sm tracking-widest mb-2">SCROLL</span>
+            <ChevronDown className="w-6 h-6" />
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
